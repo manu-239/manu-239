@@ -1,0 +1,78 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:aop="http://www.springframework.org/schema/aop"
+xmlns:context="http://www.springframework.org/schema/context"
+xmlns:jee="http://www.springframework.org/schema/jee"
+xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:mvc="http://www.springframework.org/schema/mvc"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/aop
+http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/jee
+http://www.springframework.org/schema/jee/spring-jee-3.0.xsd
+http://www.springframework.org/schema/tx
+http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+http://www.springframework.org/schema/mvc 
+http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+
+ 
+<mvc:resources mapping="/resources/**" location="/resources/" />
+ 
+<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+
+
+<bean name="/,/cars" class="com.carworld.controller.car.CarListController" init-method="dbinit">
+	<constructor-arg name="dataSource" ref="dataSource"/>
+	<property name="carService" ref="carService"/>
+</bean>
+<bean name="/cardtl" class="com.carworld.controller.car.CarDetailController" autowire="byName"/>
+<bean name="/addcar" class="com.carworld.controller.car.AddCarController" autowire="byType"/>
+<bean name="/delcar" class="com.carworld.controller.car.DeleteCarController" autowire="constructor"/>
+
+
+<bean name="carService" class="com.carworld.service.CarServiceImpl"/>
+<bean name="engineService" class="com.carworld.service.EngineServiceImpl"/>
+<bean name="manufacturerService" class="com.carworld.service.ManufacturerServiceImpl"/>
+
+
+<!-- loading the properties -->
+<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <property name="locations" value="classpath:app.properties"/>
+  <property name="systemPropertiesMode" value="1"/>
+</bean>
+
+<!-- my sql bean using above properties -->
+<bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+  <property name="driverClassName" value="${jdbc.driverClassName}"/>
+  <property name="url" value="${jdbc.url}"/>
+  <property name="username" value="${jdbc.username}"/>
+  <property name="password" value="${jdbc.password}"/>
+</bean>
+
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+<property name="prefix">
+        <value>/WEB-INF/views/</value>
+</property>
+<property name="suffix">
+    <value>.jsp</value>
+</property>
+</bean>
+
+
+<context:component-scan base-package="com.carworld.controller.engine,com.carworld.controller.manufacturer,com.carworld.dao" />
+
+<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"/>
+
+
+
+
+ 
+<!-- setting application context object in a variable present below class after spring after the context creation by bean factory-->
+<bean id="appCtxUtil"  class="com.carworld.AppCtxUtil"/> 
+ 
+</beans>
